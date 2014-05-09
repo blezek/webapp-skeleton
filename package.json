@@ -1,0 +1,20 @@
+{
+  "name": "webapp-skeleton",
+  "version": "1.0.0",
+  "author": "Daniel Blezek <daniel.blezek@gmail.com>",
+  "dependencies" : {
+    },
+  "devDependencies": {
+    "gulp-livereload": "latest",
+    "gulp-concat": "latest",
+    "tiny-lr": "latest",
+    "gulp-notify": "latest",
+    "gulp-util": "latest",
+    "gulp": "latest",
+    "gulp-cache": "latest",
+    "express": "latest",
+    "gulp-browserify": "latest",
+    "gulp-uglify": "latest",
+    "bower": "latest"
+  }
+}

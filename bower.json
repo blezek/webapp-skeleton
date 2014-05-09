@@ -1,0 +1,15 @@
+{
+  "name": "webapp-skeleton",
+  "version": "1.0.0",
+  "private": "true",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "foundation": "latest",
+    "bootstrap": "latest",
+    "backbone": "latest",
+    "angular": "latest",
+    "underscore": "latest",
+    "react": "latest"
+  }
+}
