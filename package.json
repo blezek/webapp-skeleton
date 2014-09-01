@@ -2,19 +2,49 @@
   "name": "webapp-skeleton",
   "version": "1.0.0",
   "author": "Daniel Blezek <daniel.blezek@gmail.com>",
-  "dependencies" : {
-    },
+  "dependencies": {},
   "devDependencies": {
-    "gulp-livereload": "latest",
-    "gulp-concat": "latest",
-    "tiny-lr": "latest",
-    "gulp-notify": "latest",
-    "gulp-util": "latest",
-    "gulp": "latest",
-    "gulp-cache": "latest",
+    "bootstrap": "^3.2.0",
+    "bower": "latest",
+    "browser-sync": "^1.3.6",
+    "browserify": "^5.11.0",
     "express": "latest",
-    "gulp-browserify": "latest",
+    "gulp": "latest",
+    "gulp-browserify": "^0.5.0",
+    "gulp-cache": "latest",
+    "gulp-concat": "latest",
+    "gulp-jshint": "^1.8.4",
+    "gulp-livereload": "latest",
+    "gulp-notify": "^1.5.0",
     "gulp-uglify": "latest",
-    "bower": "latest"
-  }
+    "gulp-util": "^3.0.1",
+    "jshint": "^2.5.5",
+    "jshint-stylish": "^0.4.0",
+    "mocha": "latest",
+    "phantomjs": "^1.9.7-15",
+    "pretty-hrtime": "^0.2.1",
+    "require-dir": "^0.1.0",
+    "tape": "^2.14.0",
+    "testem": "^0.6.18",
+    "tiny-lr": "latest",
+    "vinyl-source-stream": "^0.1.1",
+    "watchify": "^1.0.2"
+  },
+  "description": "webapp-skeleton ===============",
+  "main": " ",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "testem -p 12345 ci"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dblezek/webapp-skeleton.git"
+  },
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/dblezek/webapp-skeleton/issues"
+  },
+  "homepage": "https://github.com/dblezek/webapp-skeleton"
 }
