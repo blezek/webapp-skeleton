@@ -1,13 +1,12 @@
-var unzip = require ( 'unzip' );
+var JSZip = require ( 'jszip' );
 
 
-function readMRB ( stream ) {
-  stream.pipe(unzip.Parse())
-  .on('entry', function (entry) {
-    var fileName = entry.path;
-    var type = entry.type; // 'Directory' or 'File'
-    var size = entry.size;
-    console.log ( "Found a " + type + " named " + filename + " of size " + size );
-    entry.autodrain();
-  });
+module.exports.readMRB = function ( buffer ) {
+  var zip = new JSZip(buffer);
+  // console.log(zip.files);
+  for( file in zip.files ) {
+    // console.log(file);
+  }
+  console.log('returnning zip ' + zip);
+  return zip;
 }
