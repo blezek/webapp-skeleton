@@ -1,5 +1,5 @@
 {
-  "name": "webapp-skeleton",
+  "name": "mrb",
   "version": "1.0.0",
   "author": "Daniel Blezek <daniel.blezek@gmail.com>",
   "dependencies": {},
@@ -20,6 +20,8 @@
     "gulp-util": "^3.0.1",
     "jshint": "^2.5.5",
     "jshint-stylish": "^0.4.0",
+    "jszip": "^2.4.0",
+    "jszip-utils": "0.0.2",
     "mocha": "latest",
     "phantomjs": "^1.9.7-15",
     "pretty-hrtime": "^0.2.1",
@@ -31,7 +33,7 @@
     "watchify": "^1.0.2"
   },
   "description": "webapp-skeleton ===============",
-  "main": " ",
+  "main": "src/javascript/mrb",
   "directories": {
     "test": "test"
   },
