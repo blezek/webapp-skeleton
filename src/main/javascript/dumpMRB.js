@@ -1,4 +1,5 @@
 var mrb = require ( './mrb' );
+var fs = require('fs');
 
 console.log ( 'starting');
 var program = require('commander');
@@ -12,3 +13,11 @@ program
   .parse(process.argv);
 
 console.log ( "these were my arguments: ", program.args );
+
+
+
+// read a zip file
+fs.readFile(program.args[0], function(err, data) {
+  if (err) throw err;
+  mrb.readMRB(data);
+});
