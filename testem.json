@@ -12,8 +12,6 @@
   "src_files": [
     "src/**/*.js"
   ],
-  "serve_files": [
-    "build/test/index.js"
-  ],
+  "serve_files": ["build/test/index.js"],
   "launch_in_dev": ["Node", "PhantomJS"]
 }
