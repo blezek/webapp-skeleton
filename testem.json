@@ -1,0 +1,19 @@
+{
+  "launchers": {
+    "Node": {
+      "command": "node src/test/javascript/index.js",
+      "protocol": "tap"
+    },
+    "NodePlain": {
+      "command": "node src/test/javascript/index.js"
+    }
+  },
+  "framework": "tap",
+  "src_files": [
+    "src/**/*.js"
+  ],
+  "serve_files": [
+    "build/test/index.js"
+  ],
+  "launch_in_dev": ["Node", "PhantomJS"]
+}
