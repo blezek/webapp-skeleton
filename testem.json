@@ -10,7 +10,7 @@
   },
   "framework": "tap",
   "src_files": [
-    "src/**/*.js"
+    "src/test/javascript/*.js"
   ],
   "serve_files": ["build/test/index.js"],
   "launch_in_dev": ["Node", "PhantomJS"]
