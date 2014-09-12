@@ -7,6 +7,6 @@ module.exports.readMRB = function ( buffer ) {
   for( file in zip.files ) {
     // console.log(file);
   }
-  console.log('returnning zip ' + zip);
+  console.log('returning zip ' + zip);
   return zip;
 }

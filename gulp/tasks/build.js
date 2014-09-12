@@ -4,4 +4,4 @@
 
 var gulp = require('gulp');
 
-gulp.task('build', ['browserify', 'tests']);
+gulp.task('build', ['browserify', 'html', 'tests']);
