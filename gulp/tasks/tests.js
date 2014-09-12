@@ -14,6 +14,6 @@ gulp.task('tests', function() {
   .pipe(gulp.dest('./build/test/'));
 
   gulp.src('src/test/resources/**')
-  .pipe(gulp.dest('./build/test/'));
+  .pipe(gulp.dest('./build/test/resources/'));
 
 });
