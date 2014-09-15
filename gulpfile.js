@@ -1,81 +1,23 @@
 /*
-  install:
-  npm install --save-dev gulp gulp-concat gulp-notify gulp-cache gulp-livereload tiny-lr gulp-util express gulp-browserify
-  */
+gulpfile.js
+===========
+Rather than manage one giant configuration file responsible
+for creating multiple tasks, each task has been broken out into
+its own file in gulp/tasks. Any files in that directory get
+automatically required below.
+To add a new task, simply add a new task file that directory.
+gulp/tasks/default.js specifies the default set of tasks to run
+when you run `gulp`.
 
+Helpfully copied from https://github.com/greypants/gulp-starter/blob/master/gulpfile.js.
+*/
 
-var gulp = require('gulp'),
-    concat = require('gulp-concat'),
-    notify = require('gulp-notify'),
-    cache = require('gulp-cache'),
-    refresh = require('gulp-livereload'),
-    livereload = require('gulp-livereload'),
-    uglify = require('gulp-uglify'),
-    lr = require('tiny-lr'),
-    express = require('express')
+/*
+Command line arguments can be passed using this snippit:
+https://github.com/gulpjs/gulp/blob/master/docs/recipes/pass-arguments-from-cli.md
+*/
 
+var requireDir = require('require-dir');
 
-var js = ['js/**/*.js']
-var assets = ['assets/**']
-var css = ['css/**/*.css']
-var dest = 'public'
-
-
-var vendor = {
-  css: ['bower_components/**/*.css'],
-  js: ['bower_components/**/*.js']
-}
-
-
-var servers = {
-  reload: lr(),
-  app: express(),
-  port: 4000
-};
-
-// Watch these assets
-var all = [].concat ( js, assets, css )
-
-gulp.task('build', function() {
-    gulp.src(js)
-    // .pipe(concat('grater.js'))
-    .pipe(gulp.dest(dest+'/js'))
-    .pipe(refresh(servers.reload));
-
-    gulp.src(assets)
-    .pipe(gulp.dest(dest))
-    .pipe(refresh(servers.reload));
-
-    gulp.src(css)
-    .pipe(concat('grater.css'))
-    .pipe(gulp.dest(dest+'/css'))
-    .pipe(refresh(servers.reload));
-});
-
-gulp.task('lr-server', function() {
-  servers.reload.listen(35729, function(err) {
-    if (err) return console.log(err);
-  });
-});
-
-// Serve the application on the port
-gulp.task('express', function() {
-   servers.app.use(express.static(dest));
-   servers.app.listen(servers.port);
-   console.log ("App is ready at: http://localhost:" + servers.port);
-});
-
-gulp.task('default', ['lr-server', 'vendor', 'build', 'express'], function() {
-  gulp.watch(all, ['build']);
-})
-
-gulp.task('vendor', function() {
-  
-  gulp.src(vendor.css)
-  .pipe(gulp.dest('public/css'))
-
-  gulp.src(vendor.js)
-  .pipe(gulp.dest('public/js'))
-
-})
-
+// Require all tasks in gulp/tasks, including subfolders
+requireDir('./gulp/tasks', { recurse: true });
