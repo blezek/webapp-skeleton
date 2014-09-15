@@ -12,6 +12,11 @@ when you run `gulp`.
 Helpfully copied from https://github.com/greypants/gulp-starter/blob/master/gulpfile.js.
 */
 
+/*
+Command line arguments can be passed using this snippit:
+https://github.com/gulpjs/gulp/blob/master/docs/recipes/pass-arguments-from-cli.md
+*/
+
 var requireDir = require('require-dir');
 
 // Require all tasks in gulp/tasks, including subfolders
