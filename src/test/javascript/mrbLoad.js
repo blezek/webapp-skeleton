@@ -18,9 +18,13 @@ test('mrb:load', function (t) {
 test('mrb:object', function (t) {
 
   loadHelper.loadHelper('test/resources/head.mrb', function(err,data) {
-    t.plan(2);
+    t.plan(4);
     m = new mrb.MRB(data);
     t.ok(m, "Loaded MRB");
     t.equals(m.getModels().length, 10, "Number of models in the MRB file");
+
+    var data = m.getModel("head/Data/skull_bone.vtk.vtk.vtk");
+    t.ok(data, "Got model data for the skull bone");
+    t.ok(data.asArrayBuffer(), "Model data as an array buffer");
   })
 });
