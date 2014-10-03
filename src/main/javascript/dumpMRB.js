@@ -19,5 +19,10 @@ console.log ( "these were my arguments: ", program.args );
 // read a zip file
 fs.readFile(program.args[0], function(err, data) {
   if (err) throw err;
-  mrb.readMRB(data);
+  var m = new mrb.MRB(data);
+
+  fs.writeFile("test.vtk", m.convertVTKToASCII ( m.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) ) );
+
+
+
 });

@@ -12,11 +12,11 @@ r.init();
 JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
   var d = new mrb.MRB(data);
   console.log ( d.getModels() )
-  // console.log ( "Got", d.getModel ('head/Data/skull_bone.vtk.vtk.vtk' ).asBinary());
+  console.log ( "Got", d.getModel ('head/Data/skull_bone.vtk.vtk.vtk' ));
   var mesh = new X.mesh();
   mesh.file = 'data/skull_bone.vtk.vtk.vtk';
 
-  // mesh.filedata = d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ).asUint8Array();
+  mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
   // var parser = new X.parser();
   // parser.parse(null, mesh, mesh, null);
 
