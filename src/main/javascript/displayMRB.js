@@ -11,8 +11,15 @@ r.init();
 // Load our MRB file
 JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
   var d = new mrb.MRB(data);
-  console.log ( d.getModels() )
-  console.log ( "Got", d.getModel ('head/Data/skull_bone.vtk.vtk.vtk' ));
+
+  var mrmlFile = d.getMRMLs()[0];
+  var mrml = d.getFile(mrmlFile);
+
+  // Parse the XML
+  var parser = new DOMParser();
+  var xml = parser.parseFromString(mrml.asText(),"text/xml");
+  console.log(xml);
+
   var mesh = new X.mesh();
   mesh.file = 'data/skull_bone.vtk.vtk.vtk';
 
@@ -23,21 +30,6 @@ JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
   // console.log('We set the data to', mesh.filedata)
   r.add(mesh);
   r.camera.position = [0, 400, 0];
-
-
-  // create a cube
-  cube = new X.cube();
-
-  // setting the edge length can also be skipped since 20 is the default
-  cube.lengthX = cube.lengthY = cube.lengthZ = 20;
-
-  // can also be skipped since [0,0,0] is the default center
-  cube.center = [0, 0, 0];
-
-  // [1,1,1] (== white) is also the default so this can be skipped aswell
-  cube.color = [1, 1, 1];
-
-  r.add(cube); // add the cube to the renderer
 
   r.render();
 
