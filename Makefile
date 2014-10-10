@@ -3,10 +3,13 @@
 watch:
 	node_modules/.bin/gulp watch
 
+test:
+	npm test
+
 build:
 	node_modules/.bin/gulp build
 
-init:
-	npm install bower
-	npm install gulp
-	node_modules/.bin/bower install
+dev:
+	npm install
+
+.PHONY: dev build watch test
