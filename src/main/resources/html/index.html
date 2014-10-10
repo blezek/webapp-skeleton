@@ -3,11 +3,22 @@
   <head>
     <link rel="stylesheet" type="text/css" href="css/default.css">
     <title>Hello world!</title>
+    <script type="text/javascript" src="./lib/google-closure-library/closure/goog/base.js"></script>
+    <script type="text/javascript" src="./xtk-deps.js"></script>
+    <script type="text/javascript">
+
+  // include all used X-classes here
+  // this is only required when using the xtk-deps.js file
+  goog.require('X.renderer3D');
+goog.require('X.cube');
+goog.require('X.mesh');
+</script>
   </head>
   <body>
     This space for rent.
 
-    <script type="text/javascript" src="http://get.goXTK.com/xtk.js"></script>
+    <!-- <script type="text/javascript" src="http://get.goXTK.com/xtk.js"></script> -->
+
     <script type="text/javascript" src="js/app.js"></script>
   </body>
 </html>

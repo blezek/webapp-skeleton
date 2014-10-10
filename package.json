@@ -24,7 +24,8 @@
     "tape": "^2.14.0",
     "testem": "^0.6.18",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^1.0.2"
+    "watchify": "^1.0.2",
+    "xmldom": "^0.1.19"
   },
   "description": "webapp-skeleton ===============",
   "main": "src/javascript/mrb",
