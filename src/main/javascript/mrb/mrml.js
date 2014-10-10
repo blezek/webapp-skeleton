@@ -12,40 +12,49 @@ module.exports.MRML = function ( mrb ) {
     return a;
   };
 
+  var getNodes = function ( xml, name ) {
+    var nodes = {};
+    var c = xml.getElementsByTagName ( name );
+
+    for ( var i = 0; i < c.length; ++i ) {
+      var md = toObject ( c[i] );
+      nodes[md.id] = md;
+    }
+    return nodes;
+  };
+
   // Find the MRML file
-  var mrml = this.mrb.getFile(this.mrb.getMRMLs()[0]);
+  var mrmlFilename = this.mrb.getMRMLs()[0];
+  this.baseDirectory = mrmlFilename.substr(0, mrmlFilename.indexOf("/"));
+
+  var mrml = this.mrb.getFile(mrmlFilename);
 
   // Parse the XML
   var parser = new DOMParser();
   this.xml = parser.parseFromString(mrml.asText(),"text/xml");
 
-  this.cameras = {};
-  var c = this.xml.getElementsByTagName ( "Camera" );
-  console.log("Found " + c.length + " cameras");
-  for ( var i = 0; i < c.length; ++i ) {
-    var camera = toObject ( c[i] );
-    console.log(camera);
-    this.cameras[camera.id] = camera;
-  }
+  this.cameras = getNodes ( this.xml, "Camera");
+  this.storageNodes = getNodes(this.xml, "ModelStorage");
 
-  var displayNodes = {};
-  c = this.xml.getElementsByTagName ( "ModelDisplay" );
-  console.log("Found " + c.length + " ModelDisplay");
-  for ( i = 0; i < c.length; ++i ) {
-    var md = toObject ( c[i] );
-    displayNodes[md.id] = md;
-  }
+  this.displayNodes = getNodes ( this.xml, "ModelDisplay" );
 
-  this.models = {};
-  c = this.xml.getElementsByTagName ( "Model" );
-  console.log("Found " + c.length + " Models");
-  for ( i = 0; i < c.length; ++i ) {
-    var model = toObject ( c[i] );
-    model.display = displayNodes[model.displayNodeRef];
-    this.models[model.id] = model;
-  }
+  this.models = getNodes ( this.xml, "Model" );
+  var self = this;
+  // Link the models together
+  Object.keys(this.models).forEach(function(key){
+    var model = self.models[key];
+    model.display = self.displayNodes[model.displayNodeRef];
+    model.storage = self.storageNodes[model.storageNodeRef];
+    model.file = self.mrb.getModel ( self.baseDirectory + '/' + model.storage.fileName );
+  });
 
-
+  /**
+  * Get the list of display nodes.
+  * @returns display nodes found in the MRML file
+  */
+  this.getDisplayNodes = function() {
+    return this.displayNodes;
+  };
 
   /**
   * Get the models.
