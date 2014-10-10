@@ -8,27 +8,46 @@ console.log("Started!");
 var r = new X.renderer3D();
 r.init();
 
+
+// Simply show all the mesh files based on the models in the scene
+var displayModel = function ( model ) {
+
+};
+
+
 // Load our MRB file
 JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
-  var d = new mrb.MRB(data);
+  d = new mrb.MRB(data);
 
-  var mrmlFile = d.getMRMLs()[0];
-  var mrml = d.getFile(mrmlFile);
+  mrmlFile = d.getMRMLs()[0];
+  mrml = new mrb.MRML(d);
 
-  // Parse the XML
-  var parser = new DOMParser();
-  var xml = parser.parseFromString(mrml.asText(),"text/xml");
-  console.log(xml);
+  console.log ( "display nodes", mrml.getDisplayNodes());
+  console.log ( "model nodes", mrml.getModels());
 
-  var mesh = new X.mesh();
-  mesh.file = 'data/skull_bone.vtk.vtk.vtk';
+  var models = mrml.getModels();
+  Object.keys(models).forEach(function(key){
+    var model = models[key];
+    var mesh = new X.mesh();
+    mesh.file = model.storage.fileName;
+    mesh.filedata = d.convertVTKToASCII ( model.file );
+    mesh.lineWidth = parseInt ( model.display.lineWidth );
+    mesh.pointSize = parseInt ( model.display.pointSize );
+    mesh.visible = model.display.visibility;
+    mesh.opacity = parseInt ( model.display.opacity );
+    mesh.color = model.display.color.split(" ");
+    r.add(mesh);
+  });
 
-  mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
+  // var mesh = new X.mesh();
+  // mesh.file = 'data/skull_bone.vtk.vtk.vtk';
+
+  // mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
   // var parser = new X.parser();
   // parser.parse(null, mesh, mesh, null);
 
   // console.log('We set the data to', mesh.filedata)
-  r.add(mesh);
+  // r.add(mesh);
   r.camera.position = [0, 400, 0];
 
   r.render();
