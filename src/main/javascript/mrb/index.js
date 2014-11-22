@@ -13,9 +13,7 @@ module.exports.MRB = function ( buffer ) {
   */
   this.getModels = function () {
     var models = [];
-    console.log(this.zip);
     for ( var key in this.zip.files) {
-      console.log("Key: " + key);
       if (utils.endsWith(key,".vtk")) {
         models.push(key);
       }
@@ -28,7 +26,6 @@ module.exports.MRB = function ( buffer ) {
   */
   this.getMRMLs = function () {
     var mrml = [];
-    console.log(this.zip);
     for ( var key in this.zip.files) {
       if (utils.endsWith(key,".mrml")) {
         mrml.push(key);
@@ -91,7 +88,6 @@ module.exports.MRB = function ( buffer ) {
       // Get a string
       var state = findString ( buffer, index );
       line = state.string;
-      console.log("Starting convert line: " + line);
 
       if ( line.startsWith ( "POINTS") ) {
         vtk.push ( line );
@@ -99,7 +95,6 @@ module.exports.MRB = function ( buffer ) {
         numberOfPoints = parseInt ( line.split(" ")[1] );
         // Each point is 3 4-byte floats
         count = numberOfPoints * 4 * 3;
-        console.log ( "Found " + numberOfPoints + " points");
 
         pointIndex = state.next;
         for ( i = 0; i < numberOfPoints; i++ ) {
@@ -118,7 +113,6 @@ module.exports.MRB = function ( buffer ) {
         size = parseInt ( line.split ( " " )[2]);
         // 4 byte integers
         count = size * 4;
-        console.log ( "Found TriangleStrips " + numberOfStrips + " strips total");
 
         pointIndex = state.next;
         for ( i = 0; i < numberOfStrips; i++ ) {
@@ -144,7 +138,6 @@ module.exports.MRB = function ( buffer ) {
         // Now grab the binary data
         count = numberOfPoints * 4 * 3;
         pointIndex = state.next;
-        console.log("POINT_DATA, found " + numberOfPoints + " and skipping " + count);
         for ( i = 0; i < numberOfPoints; i++ ) {
           pt = [dataView.getFloat32(pointIndex, false),
           dataView.getFloat32(pointIndex + 4, false),
@@ -166,12 +159,9 @@ module.exports.MRB = function ( buffer ) {
       if ( index >= buffer.byteLength) {
         break;
       }
-
-      console.log("new index is: " + index + " line was: " + state.string );
-
     }
     s = vtk.join('\n');
-    console.log ( "Final string is " + s.length);
+    console.debug ( "Final string is " + s.length);
     var uintArray = new Uint8Array(s.length);
     for ( i = 0, j = s.length; i < j; ++i ) {
       uintArray[i] = s.charCodeAt(i);

@@ -4,10 +4,32 @@
 var mrb = require('./mrb');
 var JSZipUtils = require('jszip-utils');
 
+
+var dropzone = new Dropzone(document.body, {
+  url: "ignored",
+  previewsContainer: false,
+  createImageThumbnails: false
+});
+dropzone.on('addedfile', function(file){
+  $('#frontpage').hide();
+
+  startRenderer(file);
+
+});
+
+function startRenderer(file) {
+
+
 console.log("Started!");
 var r = new X.renderer3D();
 r.init();
 
+
+var gui = new dat.GUI();
+var cameraOptions = {};
+var cameraChoice = '';
+var options = { cameraChoice: cameraChoice };
+var objects = {};
 
 // Simply show all the mesh files based on the models in the scene
 var displayModel = function ( model ) {
@@ -16,7 +38,9 @@ var displayModel = function ( model ) {
 
 
 // Load our MRB file
-JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
+var fileReader = new FileReader();
+fileReader.onloadend =  function() {
+  var data = fileReader.result;
   d = new mrb.MRB(data);
 
   mrmlFile = d.getMRMLs()[0];
@@ -24,6 +48,31 @@ JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
 
   console.log ( "display nodes", mrml.getDisplayNodes());
   console.log ( "model nodes", mrml.getModels());
+
+  var cameras = mrml.getCameras();
+  Object.keys(cameras).forEach(function(key){
+    var camera = cameras[key];
+    console.log ( 'looking at camera', camera );
+    if (camera.hideFromEditors === "false") {
+      cameraOptions[camera.name] = key;
+    }
+  });
+  // Give us some cameras
+  var control = gui.add ( options, 'cameraChoice', cameraOptions );
+  control.onFinishChange(function(value) {
+    console.log ( "selected camera: ", value);
+    var camera = cameras[value];
+    r.camera.position = camera.position.split( " " );
+    r.camera.focus = camera.focalPoint.split( " " );
+    r.camera.up = camera.viewUp.split(" ");
+  })
+
+
+  // Toggle showing labels
+  var hover = gui.add ( r.interactor.config, "HOVERING_ENABLED");
+  hover.name = "captions"
+  console.log ( hover );
+
 
   var models = mrml.getModels();
   Object.keys(models).forEach(function(key){
@@ -33,10 +82,18 @@ JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
     mesh.filedata = d.convertVTKToASCII ( model.file );
     mesh.lineWidth = parseInt ( model.display.lineWidth );
     mesh.pointSize = parseInt ( model.display.pointSize );
-    mesh.visible = model.display.visibility;
+    mesh.visible = model.display.visibility && true;
     mesh.opacity = parseInt ( model.display.opacity );
     mesh.color = model.display.color.split(" ");
+    mesh.caption = model.name;
     r.add(mesh);
+
+    objects[mesh.id] = model;
+
+    var folder = gui.addFolder(model.name);
+    folder.add ( mesh, 'visible' );
+    folder.add ( mesh, 'opacity', 0, 1.0 );
+
   });
 
   // var mesh = new X.mesh();
@@ -50,10 +107,19 @@ JSZipUtils.getBinaryContent('data/head.mrb', function(err,data) {
   // r.add(mesh);
   r.camera.position = [0, 400, 0];
 
+  // Show the name of the moused over object
+
+
   r.render();
 
-} );
+  gui.open();
+}
 
+
+  fileReader.readAsBinaryString(file);
+
+
+}
 //
 // // create a cube
 //   cube = new X.cube();
