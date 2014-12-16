@@ -5,11 +5,23 @@ gulp.task ( 'html', ['css'], function() {
   gulp.src('src/main/resources/html/**')
   .pipe ( gulp.dest( './build/') );
 
+  gulp.src('src/main/resources/js/**')
+  .pipe ( gulp.dest( './build/js/') );
+
+  gulp.src('src/main/resources/images/**')
+  .pipe ( gulp.dest( './build/images/') );
+
   gulp.src('src/test/resources/**')
   .pipe ( gulp.dest('./build/data/'));
 
   gulp.src(['node_modules/dat-gui/vendor/dat*.js'])
   .pipe ( gulp.dest('./build/js/'));
+
+
+  // XTK Local build (if available)
+  // should copy for production
+  gulp.src(['../X/utils/xtk.js'])
+  .pipe ( gulp.dest('./build/js'));
 
   // "Vendor" packages
   // Bootstrap
@@ -27,10 +39,10 @@ gulp.task ( 'html', ['css'], function() {
   .pipe( gulp.dest('./build/js'));
 
   // Dropzone file upload
-gulp.src(['node_modules/dropzone/downloads/*js'])
-.pipe(gulp.dest('./build/js'));
-gulp.src(['node_modules/dropzone/downloads/css/**'])
-.pipe(gulp.dest('./build/css'));
-gulp.src(['node_modules/dropzone/downloads/images/**'])
-.pipe(gulp.dest('./build/images'));
+  gulp.src(['node_modules/dropzone/downloads/*js'])
+  .pipe(gulp.dest('./build/js'));
+  gulp.src(['node_modules/dropzone/downloads/css/**'])
+  .pipe(gulp.dest('./build/css'));
+  gulp.src(['node_modules/dropzone/downloads/images/**'])
+  .pipe(gulp.dest('./build/images'));
 });
