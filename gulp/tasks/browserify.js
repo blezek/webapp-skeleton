@@ -12,6 +12,7 @@ var bundleLogger = require('../util/bundleLogger');
 var gulp         = require('gulp');
 var handleErrors = require('../util/handleErrors');
 var source       = require('vinyl-source-stream');
+var reactify     = require('reactify');  // Transforms React JSX to JS.
 
 gulp.task('browserify', function() {
   var bundler = browserify({
@@ -30,6 +31,7 @@ gulp.task('browserify', function() {
     bundleLogger.start();
 
     return bundler
+      .transform(reactify)
       .bundle()
       // Report compile errors
       .on('error', handleErrors)
