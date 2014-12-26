@@ -150,6 +150,8 @@ module.exports.MRB = function ( buffer ) {
         // Increment past our data
         state.next = state.next + count;
 
+      } else if ( line.startsWith ( "BINARY" ) ) {
+        vtk.push("ASCII");
       } else {
         vtk.push ( line );
       }
@@ -161,7 +163,7 @@ module.exports.MRB = function ( buffer ) {
       }
     }
     s = vtk.join('\n');
-    console.debug ( "Final string is " + s.length);
+    // console.debug ( "Final string is " + s.length);
     var uintArray = new Uint8Array(s.length);
     for ( i = 0, j = s.length; i < j; ++i ) {
       uintArray[i] = s.charCodeAt(i);

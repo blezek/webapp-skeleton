@@ -8,112 +8,121 @@ var JSZipUtils = require('jszip-utils');
 var dropzone = new Dropzone(document.body, {
   url: "ignored",
   previewsContainer: false,
-  createImageThumbnails: false
+  createImageThumbnails: false,
+  dictDefaultMessage: ""
 });
 dropzone.on('addedfile', function(file){
   $('#frontpage').hide();
-
   startRenderer(file);
-
 });
+
+$("#file").change(function(event) {
+  console.log ( "on change!!!", event)
+  startRenderer ( event.target.files[0] );
+})
 
 function startRenderer(file) {
 
+  $("#frontpage").hide();
 
-console.log("Started!");
-var r = new X.renderer3D();
-r.init();
-
-
-var gui = new dat.GUI();
-var cameraOptions = {};
-var cameraChoice = '';
-var options = { cameraChoice: cameraChoice };
-var objects = {};
-
-// Simply show all the mesh files based on the models in the scene
-var displayModel = function ( model ) {
-
-};
+  console.log("Started!");
+  var r = new X.renderer3D();
+  r.init();
 
 
-// Load our MRB file
-var fileReader = new FileReader();
-fileReader.onloadend =  function() {
-  var data = fileReader.result;
-  d = new mrb.MRB(data);
+  var gui = new dat.GUI();
+  var cameraOptions = {};
+  var cameraChoice = '';
+  var options = { cameraChoice: cameraChoice };
+  var objects = {};
 
-  mrmlFile = d.getMRMLs()[0];
-  mrml = new mrb.MRML(d);
+  // Simply show all the mesh files based on the models in the scene
+  var displayModel = function ( model ) {
 
-  console.log ( "display nodes", mrml.getDisplayNodes());
-  console.log ( "model nodes", mrml.getModels());
-
-  var cameras = mrml.getCameras();
-  Object.keys(cameras).forEach(function(key){
-    var camera = cameras[key];
-    console.log ( 'looking at camera', camera );
-    if (camera.hideFromEditors === "false") {
-      cameraOptions[camera.name] = key;
-    }
-  });
-  // Give us some cameras
-  var control = gui.add ( options, 'cameraChoice', cameraOptions );
-  control.onFinishChange(function(value) {
-    console.log ( "selected camera: ", value);
-    var camera = cameras[value];
-    r.camera.position = camera.position.split( " " );
-    r.camera.focus = camera.focalPoint.split( " " );
-    r.camera.up = camera.viewUp.split(" ");
-  })
+  };
 
 
-  // Toggle showing labels
-  var hover = gui.add ( r.interactor.config, "HOVERING_ENABLED");
-  hover.name = "captions"
-  console.log ( hover );
+  // Load our MRB file
+  var fileReader = new FileReader();
+  fileReader.onloadend =  function() {
+    var data = fileReader.result;
+    d = new mrb.MRB(data);
+
+    mrmlFile = d.getMRMLs()[0];
+    mrml = new mrb.MRML(d);
+
+    console.log ( "display nodes", mrml.getDisplayNodes());
+    console.log ( "model nodes", mrml.getModels());
+
+    var cameras = mrml.getCameras();
+    Object.keys(cameras).forEach(function(key){
+      var camera = cameras[key];
+      console.log ( 'looking at camera', camera );
+      if (camera.hideFromEditors === "false") {
+        cameraOptions[camera.name] = key;
+      }
+    });
+    // Give us some cameras
+    var control = gui.add ( options, 'cameraChoice', cameraOptions );
+    control.onFinishChange(function(value) {
+      console.log ( "selected camera: ", value);
+      var camera = cameras[value];
+      r.camera.position = camera.position.split( " " );
+      r.camera.focus = camera.focalPoint.split( " " );
+      r.camera.up = camera.viewUp.split(" ");
+    })
 
 
-  var models = mrml.getModels();
-  Object.keys(models).forEach(function(key){
-    var model = models[key];
-    var mesh = new X.mesh();
-    mesh.file = model.storage.fileName;
-    mesh.filedata = d.convertVTKToASCII ( model.file );
-    mesh.lineWidth = parseInt ( model.display.lineWidth );
-    mesh.pointSize = parseInt ( model.display.pointSize );
-    mesh.visible = model.display.visibility && true;
-    mesh.opacity = parseInt ( model.display.opacity );
-    mesh.color = model.display.color.split(" ");
-    mesh.caption = model.name;
-    r.add(mesh);
-
-    objects[mesh.id] = model;
-
-    var folder = gui.addFolder(model.name);
-    folder.add ( mesh, 'visible' );
-    folder.add ( mesh, 'opacity', 0, 1.0 );
-
-  });
-
-  // var mesh = new X.mesh();
-  // mesh.file = 'data/skull_bone.vtk.vtk.vtk';
-
-  // mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
-  // var parser = new X.parser();
-  // parser.parse(null, mesh, mesh, null);
-
-  // console.log('We set the data to', mesh.filedata)
-  // r.add(mesh);
-  r.camera.position = [0, 400, 0];
-
-  // Show the name of the moused over object
+    // Toggle showing labels
+    var hover = gui.add ( r.interactor.config, "HOVERING_ENABLED");
+    hover.name = "captions"
+    console.log ( hover );
 
 
-  r.render();
+    var models = mrml.getModels();
 
-  gui.open();
-}
+     Object.keys(models).forEach(function(key){
+      var model = models[key];
+      var mesh = new X.mesh();
+
+      mesh.file = model.storage.fileName;
+      mesh.filedata = model.file.asArrayBuffer();
+
+      mesh.lineWidth = parseInt ( model.display.lineWidth );
+      mesh.pointSize = parseInt ( model.display.pointSize );
+      mesh.visible = model.display.visibility && true;
+      mesh.opacity = parseInt ( model.display.opacity );
+      mesh.color = model.display.color.split(" ");
+      mesh.caption = model.name;
+      r.add(mesh);
+
+      objects[mesh.id] = model;
+
+      var folder = gui.addFolder(model.name);
+      folder.add ( mesh, 'visible' );
+      folder.add ( mesh, 'opacity', 0, 1.0 );
+
+    });
+
+
+    // var mesh = new X.mesh();
+    // mesh.file = 'data/skull_bone.vtk.vtk.vtk';
+
+    // mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
+    // var parser = new X.parser();
+    // parser.parse(null, mesh, mesh, null);
+
+    // console.log('We set the data to', mesh.filedata)
+    // r.add(mesh);
+    r.camera.position = [0, 400, 0];
+
+    // Show the name of the moused over object
+
+
+    r.render();
+
+    gui.open();
+  }
 
 
   fileReader.readAsBinaryString(file);
