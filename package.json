@@ -25,12 +25,15 @@
     "jszip-utils": "0.0.2",
     "phantomjs": "^1.9.7-15",
     "pretty-hrtime": "^0.2.1",
+    "react": "^0.12.1",
+    "reactify": "^0.17.1",
     "require-dir": "^0.1.0",
     "tape": "^2.14.0",
     "testem": "^0.6.18",
     "vinyl-source-stream": "^0.1.1",
     "watchify": "^1.0.2",
-    "xmldom": "^0.1.19"
+    "xmldom": "^0.1.19",
+    "es6-promise": "^1.0.0"
   },
   "description": "webapp-skeleton ===============",
   "main": "src/javascript/mrb",
