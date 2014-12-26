@@ -3,6 +3,7 @@
 
 var mrb = require('./mrb');
 var JSZipUtils = require('jszip-utils');
+var retact = require('./ui/redact.js');
 
 
 var dropzone = new Dropzone(document.body, {
@@ -20,6 +21,15 @@ $("#file").change(function(event) {
   console.log ( "on change!!!", event)
   startRenderer ( event.target.files[0] );
 })
+
+// Here we go
+var xhr = new XMLHttpRequest();
+xhr.open ( "GET", "data/head-lite.mrb");
+xhr.responseType = 'blob';
+xhr.onload = function () {
+  // startRenderer(xhr.response);
+}
+xhr.send();
 
 function startRenderer(file) {
 
