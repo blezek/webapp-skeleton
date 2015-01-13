@@ -25,6 +25,7 @@ $("#file").change(function(event) {
 
 var q = URI.parseQuery(location.search);
 console.log(q);
+q.mrb = true
 if ( q.mrb ) {
   console.log("Got mrb", q.mrb);
   // Here we go
@@ -35,18 +36,31 @@ if ( q.mrb ) {
     email: "daniel.blezek@gmail.com",
     apikey: "uO0824aTAB7SUhnMQoQYzXxtx2lM1jXt5GwcX1lO"
   };
+
+
   $.get(loginURL, parameters)
   .done(function(response){
     console.log("Get login response...", response);
-    var xhr = new XMLHttpRequest();
-    var url = q.mrb + "?token=" + response.data.token;
-    console.log("Getting data...", url);
-    xhr.open ( "GET", url);
-    xhr.responseType = 'blob';
-    xhr.onload = function () {
-      startRenderer(xhr.response);
-    }
-    xhr.send();
+
+    // Get using jQuery
+    console.log("Requesting data...")
+
+    // OK funky, this redirects from a CORS compatable REST url
+    // to something that is not...
+    $.get( "http://slicer.kitware.com/midas3/rest/bitstream/download/206209?token=" + response.data.token,parameters).done(function(response){
+      console.log("Got data!");
+    });
+
+
+    // var xhr = new XMLHttpRequest();
+    // var url = q.mrb + "?token=" + response.data.token;
+    // console.log("Getting data...", url);
+    // xhr.open ( "GET", url);
+    // xhr.responseType = 'blob';
+    // xhr.onload = function () {
+    //   startRenderer(xhr.response);
+    // }
+    // xhr.send();
   });
 
 }
