@@ -8,6 +8,19 @@ var MRML = require ( './mrml.js').MRML;
 module.exports.MRB = function ( buffer ) {
   this.zip = new JSZip(buffer);
 
+  /** Get the images from the MRB file
+  * @returns a list of images from the MRB
+  */
+  this.getImages = function() {
+    var images = [];
+    for ( var key in this.zip.files) {
+      if (utils.endsWith(key,".nrrd")) {
+        images.push(key);
+      }
+    }
+    return images;
+  };
+
   /** Get the models from the MRB file
   * @returns a list of models from the MRB
   */
