@@ -22,14 +22,34 @@ $("#file").change(function(event) {
   startRenderer ( event.target.files[0] );
 })
 
-// Here we go
-var xhr = new XMLHttpRequest();
-xhr.open ( "GET", "data/head-lite.mrb");
-xhr.responseType = 'blob';
-xhr.onload = function () {
-  // startRenderer(xhr.response);
+
+var q = URI.parseQuery(location.search);
+console.log(q);
+if ( q.mrb ) {
+  console.log("Got mrb", q.mrb);
+  // Here we go
+
+  var loginURL = "http://slicer.kitware.com/midas3/rest/system/login";
+  var parameters = {
+    appname: "mrml-drop",
+    email: "daniel.blezek@gmail.com",
+    apikey: "uO0824aTAB7SUhnMQoQYzXxtx2lM1jXt5GwcX1lO"
+  };
+  $.get(loginURL, parameters)
+  .done(function(response){
+    console.log("Get login response...", response);
+    var xhr = new XMLHttpRequest();
+    var url = q.mrb + "?token=" + response.data.token;
+    console.log("Getting data...", url);
+    xhr.open ( "GET", url);
+    xhr.responseType = 'blob';
+    xhr.onload = function () {
+      startRenderer(xhr.response);
+    }
+    xhr.send();
+  });
+
 }
-xhr.send();
 
 function startRenderer(file) {
 

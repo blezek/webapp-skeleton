@@ -69,7 +69,7 @@ goog.require('X.mesh');
             <nav>
               <ul class="nav masthead-nav">
                 <li class="active"><a href="#">Home</a></li>
-                <li><a href="datasets.html">Datasets</a></li>
+                <li><a href="#">Datasets</a></li>
                 <li><a href="#">Help</a></li>
               </ul>
             </nav>
@@ -77,15 +77,8 @@ goog.require('X.mesh');
         </div>
 
         <div class="inner cover">
-            <div class="drop-zone" id="drop-zone">
-            <h1 class="cover-heading">Drop file here.</h1>
-            <p class="lead">Drop an MRML file to view the imaging in 3D.</p>
-            <p class="lead">
-              <span class="lead btn btn-lg btn-default btn-file">
-                or browse
-                <input type="file" id="file" name="file">
-              </span>
-            </p>
+          <div class="drop-zone" id="drop-zone">
+            <div id="dataset-list"/>
           </div>
         </div>
 
@@ -104,7 +97,6 @@ goog.require('X.mesh');
   <div id='viewer' style='display: none;'>
   </div>
 
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
-  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/javascript" src="js/listMRB.js"></script>
 </body>
 </html>

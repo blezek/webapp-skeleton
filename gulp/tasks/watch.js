@@ -7,7 +7,7 @@
 
 var gulp = require('gulp');
 
-gulp.task('watch', ['setWatch', 'browserSync'], function() {
+gulp.task('watch', ['setWatch'], function() {
 
   // no need to watch our Javascript, browserify takes care of that
   gulp.watch(['src/**/*.js', 'src/**/*.html', 'src/**/*.css', 'gulp/**/*.js'], ['build', 'tests', 'jshint']);
