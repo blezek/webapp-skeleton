@@ -143,7 +143,11 @@ function startRenderer(file) {
     cameraChoice: cameraChoice,
     sliceViewerVolume: null,
     showSliceView: true,
-    volumeChoice: null
+    volumeChoice: null,
+    resetView: function() {
+      r.resetViewAndRender();
+    }
+
     };
   var objects = {};
 
@@ -184,6 +188,7 @@ function startRenderer(file) {
       r.camera.focus = camera.focalPoint.split( " " );
       r.camera.up = camera.viewUp.split(" ");
     });
+
     controlsFolder.open();
 
     // Toggle showing labels
@@ -192,6 +197,9 @@ function startRenderer(file) {
 
     // Show / hide 2d display
     var showSliceViewController = controlsFolder.add ( options, 'showSliceView' );
+
+    // Reset view
+    controlsFolder.add(options, 'resetView');
 
 
     showSliceViewController.onFinishChange(function(value){
