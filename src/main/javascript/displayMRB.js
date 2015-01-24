@@ -4,8 +4,6 @@
 var mrb = require('./mrb');
 var JSZipUtils = require('jszip-utils');
 var retact = require('./ui/redact.js');
-
-
 var dropzone = new Dropzone(document.body, {
   url: "ignored",
   previewsContainer: false,
@@ -38,12 +36,23 @@ if ( false ) {
 
 var q = $.deparam.fragment(true);
 
+$("#loader").hide();
+var circle = new ProgressBar.Circle("#progress", {
+  color: '#fcb03c',
+  // strokeWidth: 5.0,
+  text: {
+    value: 'Loading...',
+    color: "#aaa"
+  }
+});
+
 console.log(q);
 if ( q.mrb ) {
   console.log("Got mrb", q.mrb);
   // Here we go
 
   var loginURL = "http://slicer.kitware.com/midas3/rest/system/login";
+  var loginURL = "/midas3/rest/system/login";
   var parameters = {
     appname: "mrml-drop",
     email: "daniel.blezek@gmail.com",
@@ -60,20 +69,38 @@ if ( q.mrb ) {
 
     // OK funky, this redirects from a CORS compatable REST url
     // to something that is not...
-    $.get( "http://slicer.kitware.com/midas3/rest/bitstream/download/206209?token=" + response.data.token,parameters).done(function(response){
-      console.log("Got data!");
-    });
+    var url = "http://slicer.kitware.com/midas3/rest/bitstream/download/206209?token=" + response.data.token;
+    url = "/midas3/rest/bitstream/download/206209?token=" + response.data.token;
+
+    // console.log("Requesting via jQuery")
+    // $.get( url,function() {
+    //   console.log("GET RETURNED!!!")
+    // }).done(function(response){
+    //   console.log("Got data!");
+    // }).fail(function(data){
+    //   console.log("error", data);
+    // });
 
 
-    // var xhr = new XMLHttpRequest();
-    // var url = q.mrb + "?token=" + response.data.token;
-    // console.log("Getting data...", url);
-    // xhr.open ( "GET", url);
-    // xhr.responseType = 'blob';
-    // xhr.onload = function () {
-    //   startRenderer(xhr.response);
-    // }
-    // xhr.send();
+    var xhr = new XMLHttpRequest();
+    console.log("Getting data by XHR...", url);
+    $("#loader").fadeIn();
+    circle.set(0.0);
+
+    xhr.open ( "GET", url);
+    xhr.responseType = 'blob';
+    xhr.onprogress = function (event) {
+      if ( event.lengthComputable ) {
+        var percentComplete = (event.loaded / event.total );
+        // console.log("Progress: " + percentComplete);
+        circle.animate(percentComplete)
+      }
+    }
+    xhr.onload = function () {
+      circle.animate(0.0);
+      startRenderer(xhr.response);
+    }
+    xhr.send();
   });
 
 }
@@ -83,6 +110,7 @@ function startRenderer(file) {
   $("#frontpage").hide();
   $("#viewerContainer").show();
   $("#viewer").show();
+
   // $(".sliceDisplay").hide();
 
   console.log("Started!");
@@ -107,9 +135,6 @@ function startRenderer(file) {
   sliceViewerZ.container = 'sliceZ';
   sliceViewerZ.orientation = 'Z';
   sliceViewerZ.init();
-
-
-
 
   var gui = new dat.GUI();
   var cameraOptions = {};
@@ -269,9 +294,9 @@ function startRenderer(file) {
         folder.add(volume, 'visible');
         folder.add(volume, 'volumeRendering');
         folder.add(volume, 'opacity', 0.0, 1.0);
-        folder.add(volume, 'indexX', 0, volume.range[0] - 1);
-        folder.add(volume, 'indexY', 0, volume.range[1] - 1);
-        folder.add(volume, 'indexZ', 0, volume.range[2] - 1);
+        folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
+        folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
+        folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
         folder.add(volume, 'lowerThreshold', volume.min, volume.max);
         folder.add(volume, 'upperThreshold', volume.min, volume.max);
       });
@@ -296,8 +321,12 @@ function startRenderer(file) {
         // sliceViewerX.render();
       }
 
+
+
     };
 
+    // Finally, fade out the spinner, because we are fully loaded
+    $("#loader").fadeOut();
 
   }
 
