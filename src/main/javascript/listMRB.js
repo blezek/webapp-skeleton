@@ -7,9 +7,6 @@ function(n){
   return this.substr(0,n-1)+(this.length>n?'...':'');
 };
 
-
-
-
 // An item.  A MIDAS URL looks like this:
 /*
 http://slicer.kitware.com/midas3/download/bitstream/174312/126553_LungSegments_scene.mrb%20(1)?name=126553_LungSegments_scene.mrb%20(1)
@@ -28,7 +25,7 @@ var MRMLItem = React.createClass({
       if (this.isMounted() && result.data.bitstreams.length > 0) {
         // MIDAS download URL
         var midasURL = "http://slicer.kitware.com/midas3/rest/bitstream/download/" + result.data.bitstreams[0];
-        var midasURL = "/midas3/rest/bitstream/download/" + result.data.bitstreams[0];
+        // var midasURL = "/midas3/rest/bitstream/download/" + result.data.bitstreams[0];
         // Need to tell the index page to open our MRB file
         var url = "index.html#mrb=" + encodeURIComponent(midasURL) + "&token=" + encodeURIComponent(this.props.token);
         this.setState({

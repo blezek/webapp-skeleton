@@ -236,6 +236,11 @@ function startRenderer(file) {
 
      Object.keys(models).forEach(function(key){
       var model = models[key];
+      if ( !model.file ) {
+        console.log ( "Can not load model file for " + key + " could not find file: " + model.storage.fileName, model)
+        // Return from the callback
+        return;
+      }
       var mesh = new X.mesh();
 
       mesh.file = model.storage.fileName;
