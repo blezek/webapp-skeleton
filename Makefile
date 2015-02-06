@@ -12,4 +12,8 @@ build:
 dev:
 	npm install
 
+X:
+	rsync -r ../X/ build/
+	rsync -r ../X/xtk-deps.js build/
+
 .PHONY: dev build watch test
