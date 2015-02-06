@@ -3,7 +3,6 @@
 
 var mrb = require('./mrb');
 var JSZipUtils = require('jszip-utils');
-var retact = require('./ui/redact.js');
 var dropzone = new Dropzone(document.body, {
   url: "ignored",
   previewsContainer: false,
