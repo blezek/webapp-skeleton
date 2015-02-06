@@ -15,9 +15,8 @@ dropzone.on('addedfile', function(file){
 });
 
 $("#file").change(function(event) {
-  console.log ( "on change!!!", event)
   startRenderer ( event.target.files[0] );
-})
+});
 
 // Grab a test dataset
 // This is just for testing...
@@ -29,7 +28,7 @@ if ( false ) {
   xhr.responseType = 'blob';
   xhr.onload = function () {
     startRenderer(xhr.response);
-  }
+  };
   xhr.send();
 }
 
@@ -64,7 +63,7 @@ if ( q.mrb ) {
     console.log("Get login response...", response);
 
     // Get using jQuery
-    console.log("Requesting data...")
+    console.log("Requesting data...");
 
     // OK funky, this redirects from a CORS compatable REST url
     // to something that is not...
@@ -92,13 +91,13 @@ if ( q.mrb ) {
       if ( event.lengthComputable ) {
         var percentComplete = (event.loaded / event.total );
         // console.log("Progress: " + percentComplete);
-        circle.animate(percentComplete)
+        circle.animate(percentComplete);
       }
-    }
+    };
     xhr.onload = function () {
       circle.animate(0.0);
       startRenderer(xhr.response);
-    }
+    };
     xhr.send();
   });
 
@@ -192,7 +191,7 @@ function startRenderer(file) {
 
     // Toggle showing labels
     var hover = controlsFolder.add ( r.interactor.config, "HOVERING_ENABLED");
-    hover.name = "captions"
+    hover.name = "captions";
 
     // Show / hide 2d display
     var showSliceViewController = controlsFolder.add ( options, 'showSliceView' );
@@ -236,7 +235,7 @@ function startRenderer(file) {
      Object.keys(models).forEach(function(key){
       var model = models[key];
       if ( !model.file ) {
-        console.log ( "Can not load model file for " + key + " could not find file: " + model.storage.fileName, model)
+        console.log ( "Can not load model file for " + key + " could not find file: " + model.storage.fileName, model);
         // Return from the callback
         return;
       }
@@ -298,11 +297,17 @@ function startRenderer(file) {
 
     r.onShowtime = function() {
       var volumeFolder = gui.addFolder("Volumes");
-      console.log ("Building volume GUI...");
+      console.log ("Deferred: Building volume GUI...");
       Object.keys(deferredVolumeGUI).forEach(function(key){
         var volume = deferredVolumeGUI[key];
 
-        var folder = volumeFolder.addFolder(key);
+        var displayName = key.split("/").pop();
+        console.log("Display name: " + displayName);
+        if ( !displayName ) {
+          displayName = key;
+        }
+
+        var folder = volumeFolder.addFolder(displayName);
         folder.add(volume, 'visible');
         folder.add(volume, 'volumeRendering');
         folder.add(volume, 'opacity', 0.0, 1.0);
@@ -326,7 +331,7 @@ function startRenderer(file) {
       };
       volumeSelector.onFinishChange(change);
       console.log("Last volume", lastVolume);
-      if ( lastVolume != null ) {
+      if ( lastVolume !== null ) {
         console.log("Hooking up 2d views", lastVolume);
         change(lastVolume);
         // sliceViewerX.add(lastVolume);
@@ -340,7 +345,7 @@ function startRenderer(file) {
     // Finally, fade out the spinner, because we are fully loaded
     $("#loader").fadeOut();
 
-  }
+  };
 
 
   fileReader.readAsBinaryString(file);
