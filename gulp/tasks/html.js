@@ -38,6 +38,10 @@ gulp.task ( 'html', ['css'], function() {
   gulp.src(['node_modules/jquery/dist/**'])
   .pipe( gulp.dest('./build/js'));
 
+  // Progressbar.js
+  gulp.src(['node_modules/progressbar.js/dist/*js'])
+  .pipe(gulp.dest('./build/js'));
+
   // Dropzone file upload
   gulp.src(['node_modules/dropzone/downloads/*js'])
   .pipe(gulp.dest('./build/js'));

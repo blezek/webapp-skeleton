@@ -20,11 +20,12 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.js"></script>
   <link rel="stylesheet" type="text/css" href="css/dat-gui-light-theme.css">
 
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/dropzone.js"></script>
+  <script type="text/javascript" src="js/jquery.ba-bbq.min.js"></script>
 
   <!-- If we want to debug / develop XTK, use this setup, serving
   an XTK directory with a build inside.  Otherwise, grab it from the
@@ -41,8 +42,10 @@
 // include all used X-classes here
 // this is only required when using the xtk-deps.js file
 goog.require('X.renderer3D');
+goog.require('X.renderer2D');
 goog.require('X.cube');
 goog.require('X.mesh');
+goog.require('X.volume');
 </script>
 -->
 
@@ -52,11 +55,19 @@ goog.require('X.mesh');
 
 <script src="js/bootstrap.min.js"></script>
 <script src="js/docs.min.js"></script>
+<script src="js/progressbar.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="js/ie10-viewport-bug-workaround.js"></script>
 
 </head>
 <body>
+  <div id="loader">
+    <div class="loader">
+      <div id="progress" class="loading-progress">
+      </div>
+    </div>
+  </div>
+
   <div class="site-wrapper full" id="frontpage">
 
     <div class="site-wrapper-inner">
@@ -101,8 +112,24 @@ goog.require('X.mesh');
 
   </div>
 
-  <div id='viewer' style='display: none;'>
-  </div>
+  <div id="viewerContainer" style='display: none; width: 100%; height: 100%'>
+
+    <div id='viewer' style='background-color: #000; width: 100%; margin-bottom: 2px; height: 70%;'></div>
+
+      <!-- <div id="sliceX" class="sliceDisplay"
+      style="border-top: 2px solid yellow; background-color: #000; width: 33%; height: 100%; float: left;"></div>
+      <div id="sliceY" class="sliceDisplay"
+      style="border-top: 2px solid red;background-color: #00ff00; width: 33%; height: 100%; float: left;"></div>
+      <div id="sliceZ" class="sliceDisplay"
+      style="border-top: 2px solid green; background-color: #0000ff; width: 33%; height: 100%; float: left;"></div> -->
+
+      <div id="sliceX" class="sliceDisplay"
+      style="border-top: 2px solid yellow; background-color: #000; width: 32%; height: 30%; float: left;"></div>
+      <div id="sliceY" class="sliceDisplay"
+      style="border-top: 2px solid red;background-color: #000; width: 32%; height: 30%; float: left;"></div>
+      <div id="sliceZ" class="sliceDisplay"
+      style="border-top: 2px solid green; background-color: #000; width: 32%; height: 30%; float: left;"></div>
+    </div>
 
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
   <script type="text/javascript" src="js/app.js"></script>

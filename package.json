@@ -2,8 +2,10 @@
   "name": "mrb",
   "version": "1.0.0",
   "author": "Daniel Blezek <daniel.blezek@gmail.com>",
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
+    "progressbar.js": "^0.7.4",
     "blueimp-file-upload": "git://github.com/blueimp/jQuery-File-Upload",
     "bootstrap": "^3.2.0",
     "browser-sync": "^1.3.6",
