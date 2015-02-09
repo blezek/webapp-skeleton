@@ -11,4 +11,11 @@ gulp.task ( 'javascript', function() {
   .bundle()
   .pipe(source('listMRB.js'))
   .pipe(gulp.dest('./build/js/'));
+
+  // Build the display app
+  browserify('./src/main/javascript/displayMRB.js')
+  .transform(reactify)
+  .bundle()
+  .pipe(source('app.js'))
+  .pipe(gulp.dest('./build/js/'));
 });
