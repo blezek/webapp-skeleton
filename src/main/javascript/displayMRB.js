@@ -18,6 +18,15 @@ $("#file").change(function(event) {
   startRenderer ( event.target.files[0] );
 });
 
+function setProgressText(text) {
+  $("#progress_text").text(text);
+}
+// Set the value of the progress bar as a percentage
+function setProgress ( value ) {
+  $("#progress_bar").width(value+"%");
+  $("#progress_bar").text(value + "%");
+}
+
 // Grab a test dataset
 // This is just for testing...
 if ( false ) {
@@ -105,49 +114,58 @@ if ( q.mrb ) {
 
 function startRenderer(file) {
 
-  $("#frontpage").hide();
-  $("#viewerContainer").show();
-  $("#viewer").show();
+  setProgressText ( "Loading " + file.name + "..." );
+  $("#frontpage").fadeOut('slow');
+  $("#splash").fadeIn('fast', function() {
+  });
+
+
+
+      setProgressText("Creating viewers...");
+        console.log("Started!");
+
+        $("#viewerContainer").show();
+        $("#viewer").show();
+
+        var r = new X.renderer3D();
+        r.container = 'viewer';
+        r.init();
+        // Set the canvas to have a height of 100%
+        $("#viewer").children().height('100%');
+
+        // Construct the 2d viewers
+        var sliceViewerX = new X.renderer2D();
+        sliceViewerX.container = 'sliceX';
+        sliceViewerX.orientation = 'X';
+        sliceViewerX.init();
+
+        var sliceViewerY = new X.renderer2D();
+        sliceViewerY.container = 'sliceY';
+        sliceViewerY.orientation = 'Y';
+        sliceViewerY.init();
+
+        var sliceViewerZ = new X.renderer2D();
+        sliceViewerZ.container = 'sliceZ';
+        sliceViewerZ.orientation = 'Z';
+        sliceViewerZ.init();
+
+        var gui = new dat.GUI();
+        var cameraOptions = {};
+        var cameraChoice = '';
+        var options = {
+          cameraChoice: cameraChoice,
+          sliceViewerVolume: null,
+          showSliceView: true,
+          volumeChoice: null,
+          resetView: function() {
+            r.resetViewAndRender();
+          }
+
+          };
+        var objects = {};
+
 
   // $(".sliceDisplay").hide();
-
-  console.log("Started!");
-  var r = new X.renderer3D();
-  r.container = 'viewer';
-  r.init();
-  // Set the canvas to have a height of 100%
-  $("#viewer").children().height('100%');
-
-  // Construct the 2d viewers
-  var sliceViewerX = new X.renderer2D();
-  sliceViewerX.container = 'sliceX';
-  sliceViewerX.orientation = 'X';
-  sliceViewerX.init();
-
-  var sliceViewerY = new X.renderer2D();
-  sliceViewerY.container = 'sliceY';
-  sliceViewerY.orientation = 'Y';
-  sliceViewerY.init();
-
-  var sliceViewerZ = new X.renderer2D();
-  sliceViewerZ.container = 'sliceZ';
-  sliceViewerZ.orientation = 'Z';
-  sliceViewerZ.init();
-
-  var gui = new dat.GUI();
-  var cameraOptions = {};
-  var cameraChoice = '';
-  var options = {
-    cameraChoice: cameraChoice,
-    sliceViewerVolume: null,
-    showSliceView: true,
-    volumeChoice: null,
-    resetView: function() {
-      r.resetViewAndRender();
-    }
-
-    };
-  var objects = {};
 
   // Simply show all the mesh files based on the models in the scene
   var displayModel = function ( model ) {
@@ -162,6 +180,8 @@ function startRenderer(file) {
 
     mrmlFile = d.getMRMLs()[0];
     mrml = new mrb.MRML(d);
+
+
 
     // console.log ( "display nodes", mrml.getDisplayNodes());
     // console.log ( "model nodes", mrml.getModels());
@@ -233,6 +253,7 @@ function startRenderer(file) {
     var models = mrml.getModels();
 
      Object.keys(models).forEach(function(key){
+
       var model = models[key];
       if ( !model.file ) {
         console.log ( "Can not load model file for " + key + " could not find file: " + model.storage.fileName, model);
@@ -240,6 +261,8 @@ function startRenderer(file) {
         return;
       }
       var mesh = new X.mesh();
+
+      setProgressText("Creating model: " + model.name);
 
       mesh.file = model.storage.fileName;
       mesh.filedata = model.file.asArrayBuffer();
@@ -271,7 +294,16 @@ function startRenderer(file) {
       var volume = new X.volume();
       volume.file = image;
       volume.filedata = d.getFile(image).asArrayBuffer();
-      deferredVolumeGUI[image] = volume;
+
+
+              var displayName = image.split("/").pop();
+              console.log("Display name: " + displayName);
+              if ( !displayName ) {
+                displayName = key;
+              }
+
+
+      deferredVolumeGUI[displayName] = volume;
       r.add(volume);
       lastVolume = volume;
       // sliceViewerX.add(lastVolume);
@@ -294,9 +326,14 @@ function startRenderer(file) {
     // Show the name of the moused over object
     r.render();
     gui.open();
+    setProgressText("Spinning Z axis...");
+    setProgress( 100 );
 
     r.onShowtime = function() {
+
       var volumeFolder = gui.addFolder("Volumes");
+
+      var gotFirst = false;
       console.log ("Deferred: Building volume GUI...");
       Object.keys(deferredVolumeGUI).forEach(function(key){
         var volume = deferredVolumeGUI[key];
@@ -305,6 +342,12 @@ function startRenderer(file) {
         console.log("Display name: " + displayName);
         if ( !displayName ) {
           displayName = key;
+        }
+
+        volume.visible = false;
+        if (!gotFirst) {
+          gotFirst = true;
+          volume.visible = true;
         }
 
         var folder = volumeFolder.addFolder(displayName);
@@ -337,7 +380,7 @@ function startRenderer(file) {
         // sliceViewerX.add(lastVolume);
         // sliceViewerX.render();
       }
-
+      $("#splash").fadeOut();
 
 
     };
@@ -347,7 +390,14 @@ function startRenderer(file) {
 
   };
 
+  fileReader.onprogress = function(event) {
+    if ( event.lengthComputable ) {
+      var percentange = Math.round(100 * event.loaded / event.total);
+      setProgressText ("Loading " + percentage + " (" + event.loaded + " / " + event.total + ")")
+      setProgress( percentage );
 
+    }
+  }
   fileReader.readAsBinaryString(file);
 
 
