@@ -304,7 +304,7 @@ function startRenderer(file) {
 
 
       deferredVolumeGUI[displayName] = volume;
-      r.add(volume);
+      // r.add(volume);
       lastVolume = volume;
       // sliceViewerX.add(lastVolume);
       // sliceViewerX.render();
@@ -392,7 +392,7 @@ function startRenderer(file) {
 
   fileReader.onprogress = function(event) {
     if ( event.lengthComputable ) {
-      var percentange = Math.round(100 * event.loaded / event.total);
+      var percentage = Math.round(100 * event.loaded / event.total);
       setProgressText ("Loading " + percentage + " (" + event.loaded + " / " + event.total + ")")
       setProgress( percentage );
 
