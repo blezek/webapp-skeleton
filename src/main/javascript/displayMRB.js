@@ -122,32 +122,38 @@ function startRenderer(file) {
   $("#viewerContainer").show();
   $("#viewer").show();
 
-  $("#loader").fadeOut();
-  $("#splash").fadeOut();
-
   var r = new X.renderer3D();
   r.container = 'viewer';
   r.init();
   // Set the canvas to have a height of 100%
   $("#viewer").children().height('100%');
 
+
+  function createViewers() {
+    var Viewers = {};
+    var sliceViewerX = new X.renderer2D();
+    sliceViewerX.container = 'sliceX';
+    sliceViewerX.orientation = 'X';
+    sliceViewerX.init();
+
+    var sliceViewerY = new X.renderer2D();
+    sliceViewerY.container = 'sliceY';
+    sliceViewerY.orientation = 'Y';
+    sliceViewerY.init();
+
+    var sliceViewerZ = new X.renderer2D();
+    sliceViewerZ.container = 'sliceZ';
+    sliceViewerZ.orientation = 'Z';
+    sliceViewerZ.init();
+    Viewers.sliceViewerX = sliceViewerX;
+    Viewers.sliceViewerY = sliceViewerY;
+    Viewers.sliceViewerZ = sliceViewerZ;
+    return Viewers;
+  }
+  
   // Construct the 2d viewers
-  var Viewers = {};
-  var sliceViewerX = new X.renderer2D();
-  sliceViewerX.container = 'sliceX';
-  sliceViewerX.orientation = 'X';
-  sliceViewerX.init();
-
-  var sliceViewerY = new X.renderer2D();
-  sliceViewerY.container = 'sliceY';
-  sliceViewerY.orientation = 'Y';
-  sliceViewerY.init();
-
-  var sliceViewerZ = new X.renderer2D();
-  sliceViewerZ.container = 'sliceZ';
-  sliceViewerZ.orientation = 'Z';
-  sliceViewerZ.init();
-
+  var Viewers = createViewers();
+  
   var gui = new dat.GUI();
   var cameraOptions = {};
   var cameraChoice = '';
@@ -275,7 +281,6 @@ function startRenderer(file) {
     var deferredVolumeGUI = {};
     var images = d.getImages();
     var lastVolume = null;
-    var loader = new X.loader();
 
     Object.keys(images).forEach(function(key){
       var image = images[key];
@@ -307,47 +312,60 @@ function startRenderer(file) {
 
     r.onShowtime = function() {
 
-      var volumeFolder = gui.addFolder("Volumes");
+      // var volumeFolder = gui.addFolder("Volumes");
 
-      var gotFirst = false;
-      console.log ("Deferred: Building volume GUI...");
+      // var gotFirst = false;
+      // console.log ("Deferred: Building volume GUI...");
       var volumeChoices = [];
       Object.keys(deferredVolumeGUI).forEach(function(key){
-        var volume = deferredVolumeGUI[key];
 
         var displayName = key.split("/").pop();
         console.log("Display name: " + displayName);
         if ( !displayName ) {
           displayName = key;
         }
-
-        var folder = volumeFolder.addFolder(displayName);
-        folder.add(volume, 'volumeRendering');
-        folder.add(volume, 'opacity', 0.0, 1.0);
-        // folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
-        // folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
-        // folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
-        folder.add(volume, 'lowerThreshold', volume.min, volume.max);
-        folder.add(volume, 'upperThreshold', volume.min, volume.max);
-
         volumeChoices.push ( displayName );
+
+        // var volume = deferredVolumeGUI[key];
+      //   var folder = volumeFolder.addFolder(displayName);
+      //   folder.add(volume, 'volumeRendering');
+      //   folder.add(volume, 'opacity', 0.0, 1.0);
+      //   // folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
+      //   // folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
+      //   // folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
+      //   folder.add(volume, 'lowerThreshold', volume.min, volume.max);
+      //   folder.add(volume, 'upperThreshold', volume.min, volume.max);
+
       });
 
-      // Hook up the 2d viewers to the volume...
+      // hook up the 2d viewers to the volume...
+      options.volumeChoice = lastVolume;
       var volumeSelector = controlsFolder.add ( options, 'volumeChoice', volumeChoices );
+
+      // To change volumes in the 2d viewers:
+      // 1. Destroy the 2D renderers
+      //    The do not handle switching volumes very well
+      // 2. Only 1 renderer get the volume at first
+      //    It must load it, then add to the other renderers
+      //    XTK does not handle a volume being loaded by multiple
+      //    renderers.
+      // 3. Setup the onShowtime callback before calling render
       var change = function(key){
-        console.log("Changed view to be: %o", key);
         var value = deferredVolumeGUI[key];
+
+        Viewers.sliceViewerX.destroy();
+        Viewers.sliceViewerY.destroy();
+        Viewers.sliceViewerZ.destroy();
+        Viewers = createViewers();
         
-        sliceViewerX.add(value);
-        sliceViewerX.update(value);
-        sliceViewerX.render();
-      //   sliceViewerY.add(value);
-      //   sliceViewerY.update(value);
-      //   sliceViewerY.render();
-      //   sliceViewerZ.add(value);
-      //   sliceViewerZ.update(value);
-      //   sliceViewerZ.render();
+        Viewers.sliceViewerX.add(value);
+        Viewers.sliceViewerX.onShowtime = function() {
+            Viewers.sliceViewerY.add(value);
+            Viewers.sliceViewerY.render();
+            Viewers.sliceViewerZ.add(value);
+            Viewers.sliceViewerZ.render();
+        };
+        Viewers.sliceViewerX.render();
       };
       volumeSelector.onFinishChange(change);
       console.log("Last volume", lastVolume);
@@ -370,7 +388,7 @@ function startRenderer(file) {
   fileReader.onprogress = function(event) {
     if ( event.lengthComputable ) {
       var percentage = Math.round(100 * event.loaded / event.total);
-      ui.progress.setProgressText ("Loading " + percentage + " (" + event.loaded + " / " + event.total + ")");
+      ui.progress.setProgressText ("Loading " + percentage + "%" );
       ui.progress.setProgress( percentage );
 
     }
