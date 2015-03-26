@@ -19,7 +19,7 @@ gulp.task('browserify', function() {
     // Required watchify args
     cache: {}, packageCache: {}, fullPaths: true,
     // Specify the entry point of your app
-    entries: ['./src/main/javascript/displayMRB.js'],
+    entries: ['./src/app/displayMRB.js'],
     // Add file extentions to make optional in your requires
     extensions: ['.coffee', '.hbs'],
     // Enable source maps!
