@@ -6,14 +6,14 @@ var reactify     = require('reactify');  // Transforms React JSX to JS.
 
 gulp.task ( 'javascript', function() {
   // Build any Javascript here
-  browserify('./src/main/javascript/listMRB.js')
+  browserify('./src/app/listMRB.js')
   .transform(reactify)
   .bundle()
   .pipe(source('listMRB.js'))
   .pipe(gulp.dest('./build/js/'));
 
   // Build the display app
-  browserify('./src/main/javascript/displayMRB.js')
+  browserify('./src/app/displayMRB.js')
   .transform(reactify)
   .bundle()
   .pipe(source('app.js'))

@@ -6,7 +6,7 @@ var util = require('gulp-util');
 gulp.task('tests', function() {
 
   // Be sure to change testem.json if the paths change.
-  gulp.src('src/test/javascript/index.js')
+  gulp.src('src/test/index.js')
   .pipe(browserify({
     insertGlobals : true,
     debug : !gulp.env.production
