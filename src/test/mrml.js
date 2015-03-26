@@ -1,4 +1,4 @@
-var mrb = require ( '../../main/javascript/mrb');
+var mrb = require ( '../app/mrb');
 var test = require('tape');
 var loadHelper = require('./loadHelper');
 
