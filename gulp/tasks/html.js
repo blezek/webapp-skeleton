@@ -42,6 +42,12 @@ gulp.task ( 'html', ['css'], function() {
   gulp.src(['node_modules/progressbar.js/dist/*js'])
   .pipe(gulp.dest('./build/js'));
 
+
+  // dat.gui
+  gulp.src(['node_modules/dat-gui/vendor/dat.gui.js'])
+  .pipe(gulp.dest('./build/js'));
+  
+
   // Dropzone file upload
   gulp.src(['node_modules/dropzone/downloads/*js'])
   .pipe(gulp.dest('./build/js'));
