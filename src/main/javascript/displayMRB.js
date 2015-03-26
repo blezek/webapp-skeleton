@@ -22,90 +22,10 @@ $("#file").change(function(event) {
   startRenderer ( event.target.files[0] );
 });
 
-// Grab a test dataset
-// This is just for testing...
-if ( false ) {
-  var xhr = new XMLHttpRequest();
-  var url = 'data/head.mrb';
-  console.log("Getting head.mrb...", url);
-  xhr.open ( "GET", url);
-  xhr.responseType = 'blob';
-  xhr.onload = function () {
-    startRenderer(xhr.response);
-  };
-  xhr.send();
-}
 
 var q = $.deparam.fragment(true);
 
 $("#loader").hide();
-var circle = new ProgressBar.Circle("#progress", {
-  color: '#fcb03c',
-  // strokeWidth: 5.0,
-  text: {
-    value: 'Loading...',
-    color: "#aaa"
-  }
-});
-
-console.log(q);
-if ( q.mrb ) {
-  console.log("Got mrb", q.mrb);
-  // Here we go
-
-  var loginURL = "http://slicer.kitware.com/midas3/rest/system/login";
-  var loginURL = "/midas3/rest/system/login";
-  var parameters = {
-    appname: "mrml-drop",
-    email: "daniel.blezek@gmail.com",
-    apikey: "uO0824aTAB7SUhnMQoQYzXxtx2lM1jXt5GwcX1lO"
-  };
-
-
-  $.get(loginURL, parameters)
-  .done(function(response){
-    console.log("Get login response...", response);
-
-    // Get using jQuery
-    console.log("Requesting data...");
-
-    // OK funky, this redirects from a CORS compatable REST url
-    // to something that is not...
-    var url = "http://slicer.kitware.com/midas3/rest/bitstream/download/206209?token=" + response.data.token;
-    url = "/midas3/rest/bitstream/download/206209?token=" + response.data.token;
-
-    // console.log("Requesting via jQuery")
-    // $.get( url,function() {
-    //   console.log("GET RETURNED!!!")
-    // }).done(function(response){
-    //   console.log("Got data!");
-    // }).fail(function(data){
-    //   console.log("error", data);
-    // });
-
-
-    var xhr = new XMLHttpRequest();
-    console.log("Getting data by XHR...", url);
-    $("#loader").fadeIn();
-    circle.set(0.0);
-
-    xhr.open ( "GET", url);
-    xhr.responseType = 'blob';
-    xhr.onprogress = function (event) {
-      if ( event.lengthComputable ) {
-        var percentComplete = (event.loaded / event.total );
-        // console.log("Progress: " + percentComplete);
-        circle.animate(percentComplete);
-      }
-    };
-    xhr.onload = function () {
-      circle.animate(0.0);
-      startRenderer(xhr.response);
-    };
-    xhr.send();
-  });
-
-}
 
 function startRenderer(file) {
 
@@ -113,8 +33,6 @@ function startRenderer(file) {
   $("#frontpage").fadeOut('slow');
   $("#splash").fadeIn('fast', function() {
   });
-
-
 
   ui.progress.setProgressText("Creating viewers...");
   console.log("Started!");
@@ -129,30 +47,8 @@ function startRenderer(file) {
   $("#viewer").children().height('100%');
 
 
-  function createViewers() {
-    var Viewers = {};
-    var sliceViewerX = new X.renderer2D();
-    sliceViewerX.container = 'sliceX';
-    sliceViewerX.orientation = 'X';
-    sliceViewerX.init();
-
-    var sliceViewerY = new X.renderer2D();
-    sliceViewerY.container = 'sliceY';
-    sliceViewerY.orientation = 'Y';
-    sliceViewerY.init();
-
-    var sliceViewerZ = new X.renderer2D();
-    sliceViewerZ.container = 'sliceZ';
-    sliceViewerZ.orientation = 'Z';
-    sliceViewerZ.init();
-    Viewers.sliceViewerX = sliceViewerX;
-    Viewers.sliceViewerY = sliceViewerY;
-    Viewers.sliceViewerZ = sliceViewerZ;
-    return Viewers;
-  }
-  
   // Construct the 2d viewers
-  var Viewers = createViewers();
+  var Viewers = ui.viewers.createViewers();
   
   var gui = new dat.GUI();
   var cameraOptions = {};
@@ -356,7 +252,7 @@ function startRenderer(file) {
         Viewers.sliceViewerX.destroy();
         Viewers.sliceViewerY.destroy();
         Viewers.sliceViewerZ.destroy();
-        Viewers = createViewers();
+        Viewers = ui.viewers.createViewers();
         
         Viewers.sliceViewerX.add(value);
         Viewers.sliceViewerX.onShowtime = function() {
