@@ -3,6 +3,7 @@
 
 var mrb = require('./mrb');
 var ui = require('./ui');
+var dat = require('dat-gui');
 
 var JSZipUtils = require('jszip-utils');
 
@@ -21,11 +22,6 @@ dropzone.on('addedfile', function(file){
 $("#file").change(function(event) {
   startRenderer ( event.target.files[0] );
 });
-
-
-var q = $.deparam.fragment(true);
-
-$("#loader").hide();
 
 function startRenderer(file) {
 
@@ -64,24 +60,18 @@ function startRenderer(file) {
   };
   var objects = {};
 
-
-
   // Load our MRB file
   var fileReader = new FileReader();
   fileReader.onloadend =  function() {
     var data = fileReader.result;
+    
     d = new mrb.MRB(data);
 
-    mrmlFile = d.getMRMLs()[0];
-    mrml = new mrb.MRML(d);
-
-    // console.log ( "display nodes", mrml.getDisplayNodes());
-    // console.log ( "model nodes", mrml.getModels());
+    var mrml = new mrb.MRML(d);
 
     var cameras = mrml.getCameras();
     Object.keys(cameras).forEach(function(key){
       var camera = cameras[key];
-      // console.log ( 'looking at camera', camera );
       if (camera.hideFromEditors === "false") {
         cameraOptions[camera.name] = key;
       }
@@ -92,7 +82,6 @@ function startRenderer(file) {
 
     var control = controlsFolder.add ( options, 'cameraChoice', cameraOptions );
     control.onFinishChange(function(value) {
-      // console.log ( "selected camera: ", value);
       var camera = cameras[value];
       r.camera.position = camera.position.split( " " );
       r.camera.focus = camera.focalPoint.split( " " );
@@ -111,10 +100,8 @@ function startRenderer(file) {
     // Reset view
     controlsFolder.add(options, 'resetView');
 
-
     showSliceViewController.onFinishChange(function(value){
       var updateCanvas = function() {
-        console.log ( "Making progress!" );
         // Need to send a fake resize event to keep XTK changing
         // the canvas sizes
         // $(window).resize();
@@ -124,14 +111,12 @@ function startRenderer(file) {
       };
 
       if ( value ) {
-        console.log("Showing slices");
         $(".sliceDisplay").show('fast');
         $("#viewer").animate({height: '70%'}, {
           duration: 'fast',
           progress: updateCanvas
         });
       } else {
-        console.log("Hiding slices");
         $(".sliceDisplay").hide('fast');
         $("#viewer").animate({height: '100%'}, {
           duration: 'fast',
@@ -139,7 +124,6 @@ function startRenderer(file) {
         });
       }
     });
-
 
     var modelFolder = gui.addFolder ( "Models" );
     var models = mrml.getModels();
@@ -193,25 +177,18 @@ function startRenderer(file) {
 
       deferredVolumeGUI[displayName] = volume;
       volume.visible = true;
-      // r.add(volume);
       lastVolume = displayName;
     });
 
 
     r.camera.position = [0, 400, 0];
 
-    // Show the name of the moused over object
-    r.render();
-    gui.open();
     ui.progress.setProgressText("Spinning Z axis...");
     ui.progress.setProgress( 100 );
+    r.render();
+    gui.open();
 
     r.onShowtime = function() {
-
-      // var volumeFolder = gui.addFolder("Volumes");
-
-      // var gotFirst = false;
-      // console.log ("Deferred: Building volume GUI...");
       var volumeChoices = [];
       Object.keys(deferredVolumeGUI).forEach(function(key){
 
@@ -221,16 +198,6 @@ function startRenderer(file) {
           displayName = key;
         }
         volumeChoices.push ( displayName );
-
-        // var volume = deferredVolumeGUI[key];
-      //   var folder = volumeFolder.addFolder(displayName);
-      //   folder.add(volume, 'volumeRendering');
-      //   folder.add(volume, 'opacity', 0.0, 1.0);
-      //   // folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
-      //   // folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
-      //   // folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
-      //   folder.add(volume, 'lowerThreshold', volume.min, volume.max);
-      //   folder.add(volume, 'upperThreshold', volume.min, volume.max);
 
       });
 
@@ -264,29 +231,23 @@ function startRenderer(file) {
         Viewers.sliceViewerX.render();
       };
       volumeSelector.onFinishChange(change);
-      console.log("Last volume", lastVolume);
+      
       if ( lastVolume !== null ) {
-        console.log("Hooking up 2d views", lastVolume);
         change(lastVolume);
-        // sliceViewerX.add(lastVolume);
-        // sliceViewerX.render();
       }
-      $("#splash").fadeOut();
 
 
     };
 
-    // Finally, fade out the spinner, because we are fully loaded
-    $("#loader").fadeOut();
-
+    // Finally, fade out the progressbar, because we are fully loaded
+    $("#splash").fadeOut();
   };
 
   fileReader.onprogress = function(event) {
     if ( event.lengthComputable ) {
       var percentage = Math.round(100 * event.loaded / event.total);
-      ui.progress.setProgressText ("Loading " + percentage + "%" );
+      ui.progress.setProgressText (percentage + "%" );
       ui.progress.setProgress( percentage );
-
     }
   };
   fileReader.readAsBinaryString(file);
