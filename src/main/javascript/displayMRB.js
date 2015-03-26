@@ -2,13 +2,17 @@
 */
 
 var mrb = require('./mrb');
+var ui = require('./ui');
+
 var JSZipUtils = require('jszip-utils');
+
 var dropzone = new Dropzone(document.body, {
   url: "ignored",
   previewsContainer: false,
   createImageThumbnails: false,
   dictDefaultMessage: ""
 });
+
 dropzone.on('addedfile', function(file){
   $('#frontpage').hide();
   startRenderer(file);
@@ -105,35 +109,51 @@ if ( q.mrb ) {
 
 function startRenderer(file) {
 
-  $("#frontpage").hide();
+  ui.progress.setProgressText ( "Loading " + file.name + "..." );
+  $("#frontpage").fadeOut('slow');
+  $("#splash").fadeIn('fast', function() {
+  });
+
+
+
+  ui.progress.setProgressText("Creating viewers...");
+  console.log("Started!");
+
   $("#viewerContainer").show();
   $("#viewer").show();
 
-  // $(".sliceDisplay").hide();
-
-  console.log("Started!");
   var r = new X.renderer3D();
   r.container = 'viewer';
   r.init();
   // Set the canvas to have a height of 100%
   $("#viewer").children().height('100%');
 
+
+  function createViewers() {
+    var Viewers = {};
+    var sliceViewerX = new X.renderer2D();
+    sliceViewerX.container = 'sliceX';
+    sliceViewerX.orientation = 'X';
+    sliceViewerX.init();
+
+    var sliceViewerY = new X.renderer2D();
+    sliceViewerY.container = 'sliceY';
+    sliceViewerY.orientation = 'Y';
+    sliceViewerY.init();
+
+    var sliceViewerZ = new X.renderer2D();
+    sliceViewerZ.container = 'sliceZ';
+    sliceViewerZ.orientation = 'Z';
+    sliceViewerZ.init();
+    Viewers.sliceViewerX = sliceViewerX;
+    Viewers.sliceViewerY = sliceViewerY;
+    Viewers.sliceViewerZ = sliceViewerZ;
+    return Viewers;
+  }
+  
   // Construct the 2d viewers
-  var sliceViewerX = new X.renderer2D();
-  sliceViewerX.container = 'sliceX';
-  sliceViewerX.orientation = 'X';
-  sliceViewerX.init();
-
-  var sliceViewerY = new X.renderer2D();
-  sliceViewerY.container = 'sliceY';
-  sliceViewerY.orientation = 'Y';
-  sliceViewerY.init();
-
-  var sliceViewerZ = new X.renderer2D();
-  sliceViewerZ.container = 'sliceZ';
-  sliceViewerZ.orientation = 'Z';
-  sliceViewerZ.init();
-
+  var Viewers = createViewers();
+  
   var gui = new dat.GUI();
   var cameraOptions = {};
   var cameraChoice = '';
@@ -145,13 +165,9 @@ function startRenderer(file) {
     resetView: function() {
       r.resetViewAndRender();
     }
-
-    };
+  };
   var objects = {};
 
-  // Simply show all the mesh files based on the models in the scene
-  var displayModel = function ( model ) {
-  };
 
 
   // Load our MRB file
@@ -265,69 +281,91 @@ function startRenderer(file) {
     var deferredVolumeGUI = {};
     var images = d.getImages();
     var lastVolume = null;
+
     Object.keys(images).forEach(function(key){
       var image = images[key];
       console.log("Got an image!", image);
       var volume = new X.volume();
       volume.file = image;
       volume.filedata = d.getFile(image).asArrayBuffer();
-      deferredVolumeGUI[image] = volume;
-      r.add(volume);
-      lastVolume = volume;
-      // sliceViewerX.add(lastVolume);
-      // sliceViewerX.render();
 
+      var displayName = image.split("/").pop();
+      console.log("Display name: " + displayName);
+      if ( !displayName ) {
+        displayName = key;
+      }
+
+      deferredVolumeGUI[displayName] = volume;
+      volume.visible = true;
+      // r.add(volume);
+      lastVolume = displayName;
     });
 
 
-    // var mesh = new X.mesh();
-    // mesh.file = 'data/skull_bone.vtk.vtk.vtk';
-
-    // mesh.filedata = d.convertVTKToASCII ( d.getModel ( 'head/Data/skull_bone.vtk.vtk.vtk' ) );
-    // var parser = new X.parser();
-    // parser.parse(null, mesh, mesh, null);
-
-    // console.log('We set the data to', mesh.filedata)
-    // r.add(mesh);
     r.camera.position = [0, 400, 0];
 
     // Show the name of the moused over object
     r.render();
     gui.open();
+    ui.progress.setProgressText("Spinning Z axis...");
+    ui.progress.setProgress( 100 );
 
     r.onShowtime = function() {
-      var volumeFolder = gui.addFolder("Volumes");
-      console.log ("Deferred: Building volume GUI...");
+
+      // var volumeFolder = gui.addFolder("Volumes");
+
+      // var gotFirst = false;
+      // console.log ("Deferred: Building volume GUI...");
+      var volumeChoices = [];
       Object.keys(deferredVolumeGUI).forEach(function(key){
-        var volume = deferredVolumeGUI[key];
 
         var displayName = key.split("/").pop();
         console.log("Display name: " + displayName);
         if ( !displayName ) {
           displayName = key;
         }
+        volumeChoices.push ( displayName );
 
-        var folder = volumeFolder.addFolder(displayName);
-        folder.add(volume, 'visible');
-        folder.add(volume, 'volumeRendering');
-        folder.add(volume, 'opacity', 0.0, 1.0);
-        folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
-        folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
-        folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
-        folder.add(volume, 'lowerThreshold', volume.min, volume.max);
-        folder.add(volume, 'upperThreshold', volume.min, volume.max);
+        // var volume = deferredVolumeGUI[key];
+      //   var folder = volumeFolder.addFolder(displayName);
+      //   folder.add(volume, 'volumeRendering');
+      //   folder.add(volume, 'opacity', 0.0, 1.0);
+      //   // folder.add(volume, 'indexX', 0, volume.range[0] - 1).listen();
+      //   // folder.add(volume, 'indexY', 0, volume.range[1] - 1).listen();
+      //   // folder.add(volume, 'indexZ', 0, volume.range[2] - 1).listen();
+      //   folder.add(volume, 'lowerThreshold', volume.min, volume.max);
+      //   folder.add(volume, 'upperThreshold', volume.min, volume.max);
+
       });
 
-      // Hook up the 2d viewers to the volume...
-      var volumeSelector = controlsFolder.add ( options, 'volumeChoice', deferredVolumeGUI );
-      var change = function(value){
-        console.log("Changed view to be: ", value);
-        sliceViewerX.add(value);
-        sliceViewerX.render();
-        sliceViewerY.add(value);
-        sliceViewerY.render();
-        sliceViewerZ.add(value);
-        sliceViewerZ.render();
+      // hook up the 2d viewers to the volume...
+      options.volumeChoice = lastVolume;
+      var volumeSelector = controlsFolder.add ( options, 'volumeChoice', volumeChoices );
+
+      // To change volumes in the 2d viewers:
+      // 1. Destroy the 2D renderers
+      //    The do not handle switching volumes very well
+      // 2. Only 1 renderer get the volume at first
+      //    It must load it, then add to the other renderers
+      //    XTK does not handle a volume being loaded by multiple
+      //    renderers.
+      // 3. Setup the onShowtime callback before calling render
+      var change = function(key){
+        var value = deferredVolumeGUI[key];
+
+        Viewers.sliceViewerX.destroy();
+        Viewers.sliceViewerY.destroy();
+        Viewers.sliceViewerZ.destroy();
+        Viewers = createViewers();
+        
+        Viewers.sliceViewerX.add(value);
+        Viewers.sliceViewerX.onShowtime = function() {
+            Viewers.sliceViewerY.add(value);
+            Viewers.sliceViewerY.render();
+            Viewers.sliceViewerZ.add(value);
+            Viewers.sliceViewerZ.render();
+        };
+        Viewers.sliceViewerX.render();
       };
       volumeSelector.onFinishChange(change);
       console.log("Last volume", lastVolume);
@@ -337,7 +375,7 @@ function startRenderer(file) {
         // sliceViewerX.add(lastVolume);
         // sliceViewerX.render();
       }
-
+      $("#splash").fadeOut();
 
 
     };
@@ -347,23 +385,15 @@ function startRenderer(file) {
 
   };
 
+  fileReader.onprogress = function(event) {
+    if ( event.lengthComputable ) {
+      var percentage = Math.round(100 * event.loaded / event.total);
+      ui.progress.setProgressText ("Loading " + percentage + "%" );
+      ui.progress.setProgress( percentage );
 
+    }
+  };
   fileReader.readAsBinaryString(file);
 
 
 }
-//
-// // create a cube
-//   cube = new X.cube();
-//
-//   // setting the edge length can also be skipped since 20 is the default
-//   cube.lengthX = cube.lengthY = cube.lengthZ = 20;
-//
-//   // can also be skipped since [0,0,0] is the default center
-//   cube.center = [0, 0, 0];
-//
-//   // [1,1,1] (== white) is also the default so this can be skipped aswell
-//   cube.color = [1, 1, 1];
-//
-//   r.add(cube); // add the cube to the renderer
-//   r.render(); // ..and render it
