@@ -13,6 +13,7 @@ dev:
 	npm install
 
 X:
+	(cd ../X/utils && ./build.py)
 	rsync -r ../X/ build/
 	rsync -r ../X/xtk-deps.js build/
 

@@ -2,16 +2,16 @@ var gulp = require ('gulp');
 
 
 gulp.task ( 'html', ['css'], function() {
-  gulp.src('src/main/resources/html/**')
+  gulp.src('src/app/assets/html/**')
   .pipe ( gulp.dest( './build/') );
 
-  gulp.src('src/main/resources/js/**')
+  gulp.src('src/app/assets/js/**')
   .pipe ( gulp.dest( './build/js/') );
 
-  gulp.src('src/main/resources/images/**')
+  gulp.src('src/app/assets/images/**')
   .pipe ( gulp.dest( './build/images/') );
 
-  gulp.src('src/test/resources/**')
+  gulp.src('src/test/assets/**')
   .pipe ( gulp.dest('./build/data/'));
 
   gulp.src(['node_modules/dat-gui/vendor/dat*.js'])
@@ -41,6 +41,12 @@ gulp.task ( 'html', ['css'], function() {
   // Progressbar.js
   gulp.src(['node_modules/progressbar.js/dist/*js'])
   .pipe(gulp.dest('./build/js'));
+
+
+  // dat.gui
+  gulp.src(['node_modules/dat-gui/vendor/dat.gui.js'])
+  .pipe(gulp.dest('./build/js'));
+  
 
   // Dropzone file upload
   gulp.src(['node_modules/dropzone/downloads/*js'])

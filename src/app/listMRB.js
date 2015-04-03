@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
 var React = require('react');  // Browserify!
 
-
 String.prototype.trunc =
 function(n){
   return this.substr(0,n-1)+(this.length>n?'...':'');
@@ -36,8 +35,8 @@ var MRMLItem = React.createClass({
     }.bind(this));
   },
   render: function () {
-    console.log ( "MRMLItem.render", this.props, this.state)
-
+    console.log ( "MRMLItem.render", this.props, this.state);
+    /* jshint ignore:start */
     return (
       <tr className="MRMLItem">
       <td>
@@ -53,6 +52,7 @@ var MRMLItem = React.createClass({
         </td>
       </tr>
     );
+    /* jshint ignore:end */
   }
 });
 
