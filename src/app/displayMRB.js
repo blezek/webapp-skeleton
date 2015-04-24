@@ -254,3 +254,56 @@ function startRenderer(file) {
 
 
 }
+
+
+
+// Load based on URL fragment
+var hashChange = function() {
+  console.log ( "in hashChange: " + window.location.hash);
+  if ( window.location.hash ) {
+    
+    // Here we go
+    var url = window.location.hash.substring(1);
+    var xhr = new XMLHttpRequest();
+    console.log("Getting data by XHR...", url);
+
+    xhr.open ( "GET", url);
+    xhr.responseType = 'blob';
+    xhr.onprogress = function (event) {
+      if ( event.lengthComputable ) {
+        var percentComplete = Math.round( 100 * event.loaded / event.total );
+        ui.progress.setProgressText("Download: " + percentComplete + "%" );
+        ui.progress.setProgress( percentComplete );
+      }
+    };
+    xhr.onload = function () {
+      console.log(xhr);
+      console.log(xhr.status);
+      if ( xhr.status != 200 ) {
+        ui.progress.setProgressText("Download failed: " + xhr.statusText);
+        alert("Download failed.\nClick 'OK' to reload.");
+        location.assign(location.origin + location.pathname);
+      } else {
+        startRenderer(xhr.response);
+      }
+    };
+
+    ui.progress.setProgressText ( "Loading " + file.name + "..." );
+    $("#frontpage").fadeOut('slow');
+    $("#splash").fadeIn('fast', function() {
+    });
+
+    ui.progress.setProgressText("Creating viewers...");
+
+    
+    xhr.send();
+  }
+};
+window.onhashchange = hashChange;
+hashChange();
+
+// Lastly, try to load example data
+$.get ( "example-data/examples.txt" )
+  .done(function(data) {
+    $("#example-datasets").fadeIn();
+  });
