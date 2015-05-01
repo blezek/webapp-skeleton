@@ -56,6 +56,9 @@ function startRenderer(file) {
     volumeChoice: null,
     resetView: function() {
       r.resetViewAndRender();
+    },
+    resetPage: function() {
+      window.location.assign ( window.location.origin + window.location.pathname );
     }
   };
   var objects = {};
@@ -100,6 +103,9 @@ function startRenderer(file) {
     // Reset view
     controlsFolder.add(options, 'resetView');
 
+    // Back button
+    $("#back-button").click(options.resetPage);
+    
     showSliceViewController.onFinishChange(function(value){
       var updateCanvas = function() {
         // Need to send a fake resize event to keep XTK changing
